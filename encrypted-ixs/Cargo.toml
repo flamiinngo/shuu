@@ -1,0 +1,13 @@
+[package]
+name = "encrypted-ixs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+arcis = { version = "0.9.6" }
+
+[target.'cfg(not(target_os = "solana"))'.lints.rust]
+unexpected_cfgs = { level = "allow" }

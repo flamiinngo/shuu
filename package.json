@@ -1,0 +1,28 @@
+{
+  "name": "shuu",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "patch-package",
+    "build": "arcium build",
+    "test": "yarn run ts-mocha -p ./tsconfig.json -t 2000000 \"tests/**/*.ts\"",
+    "deploy": "arcium deploy --cluster-offset 456 --recovery-set-size 4 --keypair-path ~/.config/solana/id.json --rpc-url devnet"
+  },
+  "dependencies": {
+    "@arcium-hq/client": "0.9.6",
+    "@coral-xyz/anchor": "^0.32.1",
+    "@noble/curves": "^1.4.0",
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.6",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
+    "chai": "^4.5.0",
+    "mocha": "^10.7.3",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.4.5"
+  }
+}

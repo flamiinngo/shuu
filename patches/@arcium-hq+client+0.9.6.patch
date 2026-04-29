@@ -1,0 +1,334 @@
+diff --git a/node_modules/@arcium-hq/client/README.md b/node_modules/@arcium-hq/client/README.md
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/index.cjs b/node_modules/@arcium-hq/client/build/index.cjs
+old mode 100644
+new mode 100755
+index 91c64d4..366c2bd
+--- a/node_modules/@arcium-hq/client/build/index.cjs
++++ b/node_modules/@arcium-hq/client/build/index.cjs
+@@ -14860,7 +14860,7 @@ function getCircuitState(circuitSource) {
+  * @param confirmOptions - Transaction confirmation options.
+  * @returns Array of transaction signatures for all upload and finalize transactions.
+  */
+-async function uploadCircuit(provider, circuitName, mxeProgramId, rawCircuit, logging = true, chunkSize = 500, confirmOptions) {
++async function uploadCircuit(provider, circuitName, mxeProgramId, rawCircuit, logging = true, chunkSize = 15, confirmOptions) {
+     const compDefAccInfo = getCompDefAccInfo(circuitName, mxeProgramId);
+     const program = getArciumProgram(provider);
+     const compDefAcc = await program.account.computationDefinitionAccount.fetch(compDefAccInfo.pubkey);
+@@ -14921,13 +14921,14 @@ async function buildFinalizeCompDefTx(provider, compDefOffset, mxeProgramId) {
+     })
+         .transaction();
+ }
+-async function uploadToCircuitAcc(provider, program, rawCircuitPart, rawCircuitIndex, compDefAccInfo, mxeProgramId, shouldLog = true, chunkSize = 500, confirmOptions) {
++async function uploadToCircuitAcc(provider, program, rawCircuitPart, rawCircuitIndex, compDefAccInfo, mxeProgramId, shouldLog = true, chunkSize = 15, confirmOptions) {
+     const rawCircuitPda = getRawCircuitAccAddress(compDefAccInfo.pubkey, rawCircuitIndex);
+     const existingAcc = await provider.connection.getAccountInfo(rawCircuitPda);
+     // Skip entirely if account exists with correct size (pre-seeded at genesis or already uploaded)
+     // Account layout: 8-byte discriminator + 1-byte bump + circuit data
+     const requiredAccountSize = rawCircuitPart.length + 9;
+-    if (existingAcc !== null && existingAcc.data.length >= requiredAccountSize) {
++    // PATCHED skip-on-size unsafe (partial uploads pass with zero data)
++    if (false && existingAcc !== null && existingAcc.data.length >= requiredAccountSize) {
+         optionalLog(shouldLog, `Raw circuit acc ${rawCircuitIndex} already exists with sufficient size, skipping`);
+         return [];
+     }
+diff --git a/node_modules/@arcium-hq/client/build/index.mjs b/node_modules/@arcium-hq/client/build/index.mjs
+old mode 100644
+new mode 100755
+index 21820a9..03360e9
+--- a/node_modules/@arcium-hq/client/build/index.mjs
++++ b/node_modules/@arcium-hq/client/build/index.mjs
+@@ -14841,7 +14841,7 @@ function getCircuitState(circuitSource) {
+  * @param confirmOptions - Transaction confirmation options.
+  * @returns Array of transaction signatures for all upload and finalize transactions.
+  */
+-async function uploadCircuit(provider, circuitName, mxeProgramId, rawCircuit, logging = true, chunkSize = 500, confirmOptions) {
++async function uploadCircuit(provider, circuitName, mxeProgramId, rawCircuit, logging = true, chunkSize = 15, confirmOptions) {
+     const compDefAccInfo = getCompDefAccInfo(circuitName, mxeProgramId);
+     const program = getArciumProgram(provider);
+     const compDefAcc = await program.account.computationDefinitionAccount.fetch(compDefAccInfo.pubkey);
+@@ -14902,13 +14902,14 @@ async function buildFinalizeCompDefTx(provider, compDefOffset, mxeProgramId) {
+     })
+         .transaction();
+ }
+-async function uploadToCircuitAcc(provider, program, rawCircuitPart, rawCircuitIndex, compDefAccInfo, mxeProgramId, shouldLog = true, chunkSize = 500, confirmOptions) {
++async function uploadToCircuitAcc(provider, program, rawCircuitPart, rawCircuitIndex, compDefAccInfo, mxeProgramId, shouldLog = true, chunkSize = 15, confirmOptions) {
+     const rawCircuitPda = getRawCircuitAccAddress(compDefAccInfo.pubkey, rawCircuitIndex);
+     const existingAcc = await provider.connection.getAccountInfo(rawCircuitPda);
+     // Skip entirely if account exists with correct size (pre-seeded at genesis or already uploaded)
+     // Account layout: 8-byte discriminator + 1-byte bump + circuit data
+     const requiredAccountSize = rawCircuitPart.length + 9;
+-    if (existingAcc !== null && existingAcc.data.length >= requiredAccountSize) {
++    // PATCHED skip-on-size unsafe (partial uploads pass with zero data)
++    if (false && existingAcc !== null && existingAcc.data.length >= requiredAccountSize) {
+         optionalLog(shouldLog, `Raw circuit acc ${rawCircuitIndex} already exists with sufficient size, skipping`);
+         return [];
+     }
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/arcisModule.d.ts b/node_modules/@arcium-hq/client/build/types/arcis/arcisModule.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/arcisModule.d.ts.map b/node_modules/@arcium-hq/client/build/types/arcis/arcisModule.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/arcisType.d.ts b/node_modules/@arcium-hq/client/build/types/arcis/arcisType.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/arcisType.d.ts.map b/node_modules/@arcium-hq/client/build/types/arcis/arcisType.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/packer.d.ts b/node_modules/@arcium-hq/client/build/types/arcis/packer.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/packer.d.ts.map b/node_modules/@arcium-hq/client/build/types/arcis/packer.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/packing.d.ts b/node_modules/@arcium-hq/client/build/types/arcis/packing.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/arcis/packing.d.ts.map b/node_modules/@arcium-hq/client/build/types/arcis/packing.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/callback.d.ts b/node_modules/@arcium-hq/client/build/types/callback.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/callback.d.ts.map b/node_modules/@arcium-hq/client/build/types/callback.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/constants.d.ts b/node_modules/@arcium-hq/client/build/types/constants.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/constants.d.ts.map b/node_modules/@arcium-hq/client/build/types/constants.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes128Cipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/aes128Cipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes128Cipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/aes128Cipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes192Cipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/aes192Cipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes192Cipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/aes192Cipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes256Cipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/aes256Cipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aes256Cipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/aes256Cipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aesCtrCipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/aesCtrCipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/aesCtrCipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/aesCtrCipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/arcisEd25519.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/arcisEd25519.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/arcisEd25519.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/arcisEd25519.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/cSplRescueCipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/cSplRescueCipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/cSplRescueCipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/cSplRescueCipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/cryptography.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/cryptography.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/cryptography.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/cryptography.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/hkdf.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/hkdf.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/hkdf.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/hkdf.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/hmac.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/hmac.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/hmac.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/hmac.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipher.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipher.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipher.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipher.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipherCommon.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipherCommon.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipherCommon.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/rescueCipherCommon.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueDesc.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/rescueDesc.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescueDesc.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/rescueDesc.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescuePrimeHash.d.ts b/node_modules/@arcium-hq/client/build/types/cryptography/rescuePrimeHash.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/cryptography/rescuePrimeHash.d.ts.map b/node_modules/@arcium-hq/client/build/types/cryptography/rescuePrimeHash.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/ctUtils.d.ts b/node_modules/@arcium-hq/client/build/types/ctUtils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/ctUtils.d.ts.map b/node_modules/@arcium-hq/client/build/types/ctUtils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/arcium.d.ts b/node_modules/@arcium-hq/client/build/types/idl/arcium.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/arcium.d.ts.map b/node_modules/@arcium-hq/client/build/types/idl/arcium.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/arcium_staking.d.ts b/node_modules/@arcium-hq/client/build/types/idl/arcium_staking.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/arcium_staking.d.ts.map b/node_modules/@arcium-hq/client/build/types/idl/arcium_staking.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/index.d.ts b/node_modules/@arcium-hq/client/build/types/idl/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/idl/index.d.ts.map b/node_modules/@arcium-hq/client/build/types/idl/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/index.d.ts b/node_modules/@arcium-hq/client/build/types/index.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/index.d.ts.map b/node_modules/@arcium-hq/client/build/types/index.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/localEnv.d.ts b/node_modules/@arcium-hq/client/build/types/localEnv.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/localEnv.d.ts.map b/node_modules/@arcium-hq/client/build/types/localEnv.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/matrix.d.ts b/node_modules/@arcium-hq/client/build/types/matrix.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/matrix.d.ts.map b/node_modules/@arcium-hq/client/build/types/matrix.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/onchain.d.ts b/node_modules/@arcium-hq/client/build/types/onchain.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/onchain.d.ts.map b/node_modules/@arcium-hq/client/build/types/onchain.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/pda.d.ts b/node_modules/@arcium-hq/client/build/types/pda.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/pda.d.ts.map b/node_modules/@arcium-hq/client/build/types/pda.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/utils.d.ts b/node_modules/@arcium-hq/client/build/types/utils.d.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/build/types/utils.d.ts.map b/node_modules/@arcium-hq/client/build/types/utils.d.ts.map
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/arcis/arcisModule.ts b/node_modules/@arcium-hq/client/src/arcis/arcisModule.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/arcis/arcisType.ts b/node_modules/@arcium-hq/client/src/arcis/arcisType.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/arcis/packer.ts b/node_modules/@arcium-hq/client/src/arcis/packer.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/arcis/packing.ts b/node_modules/@arcium-hq/client/src/arcis/packing.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/callback.ts b/node_modules/@arcium-hq/client/src/callback.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/constants.ts b/node_modules/@arcium-hq/client/src/constants.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/aes128Cipher.ts b/node_modules/@arcium-hq/client/src/cryptography/aes128Cipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/aes192Cipher.ts b/node_modules/@arcium-hq/client/src/cryptography/aes192Cipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/aes256Cipher.ts b/node_modules/@arcium-hq/client/src/cryptography/aes256Cipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/aesCtrCipher.ts b/node_modules/@arcium-hq/client/src/cryptography/aesCtrCipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/arcisEd25519.ts b/node_modules/@arcium-hq/client/src/cryptography/arcisEd25519.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/cSplRescueCipher.ts b/node_modules/@arcium-hq/client/src/cryptography/cSplRescueCipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/cryptography.ts b/node_modules/@arcium-hq/client/src/cryptography/cryptography.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/hkdf.ts b/node_modules/@arcium-hq/client/src/cryptography/hkdf.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/hmac.ts b/node_modules/@arcium-hq/client/src/cryptography/hmac.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/rescueCipher.ts b/node_modules/@arcium-hq/client/src/cryptography/rescueCipher.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/rescueCipherCommon.ts b/node_modules/@arcium-hq/client/src/cryptography/rescueCipherCommon.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/rescueDesc.ts b/node_modules/@arcium-hq/client/src/cryptography/rescueDesc.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/cryptography/rescuePrimeHash.ts b/node_modules/@arcium-hq/client/src/cryptography/rescuePrimeHash.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/ctUtils.ts b/node_modules/@arcium-hq/client/src/ctUtils.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/idl/arcium.json b/node_modules/@arcium-hq/client/src/idl/arcium.json
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/idl/arcium.ts b/node_modules/@arcium-hq/client/src/idl/arcium.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/idl/arcium_staking.json b/node_modules/@arcium-hq/client/src/idl/arcium_staking.json
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/idl/arcium_staking.ts b/node_modules/@arcium-hq/client/src/idl/arcium_staking.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/idl/index.ts b/node_modules/@arcium-hq/client/src/idl/index.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/index.ts b/node_modules/@arcium-hq/client/src/index.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/localEnv.ts b/node_modules/@arcium-hq/client/src/localEnv.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/matrix.ts b/node_modules/@arcium-hq/client/src/matrix.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/onchain.ts b/node_modules/@arcium-hq/client/src/onchain.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/pda.ts b/node_modules/@arcium-hq/client/src/pda.ts
+old mode 100644
+new mode 100755
+diff --git a/node_modules/@arcium-hq/client/src/utils.ts b/node_modules/@arcium-hq/client/src/utils.ts
+old mode 100644
+new mode 100755

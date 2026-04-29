@@ -1,0 +1,31 @@
+target/
+node_modules/
+dist/
+.anchor/
+test-ledger/
+*.so
+
+# Tooling / editor artifacts
+.agents/
+.claude/
+.junie/
+
+# Local env / secrets
+.env
+.env.local
+*.env
+
+# Local test wallet (contains a private key)
+scripts/test-wallet.json
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

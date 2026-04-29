@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "arcium": {
+      "source": "arcium-hq/agent-skills",
+      "sourceType": "github",
+      "computedHash": "327105af4d78203344c6d0f5dc4788bc70295adaf408294fea8f9cd72a18e323"
+    }
+  }
+}

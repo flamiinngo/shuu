@@ -1,0 +1,27 @@
+[package]
+name = "shuu"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "shuu"
+
+[dependencies]
+anchor-lang    = { version = "0.32.1", features = ["init-if-needed"] }
+anchor-spl     = { version = "0.32.1", features = ["token", "associated_token"] }
+arcium-anchor  = { version = "=0.9.6" }
+arcium-macros  = { version = "=0.9.6" }
+arcium-client  = { version = "=0.9.6", default-features = false }
+unicode-segmentation = "=1.12.0"
+
+[features]
+default       = []
+cpi           = ["no-entrypoint"]
+no-entrypoint = []
+no-idl        = []
+no-log-ix-name = []
+idl-build     = ["anchor-lang/idl-build", "anchor-spl/idl-build", "arcium-anchor/idl-build"]
+
+[target.'cfg(not(target_os = "solana"))'.lints.rust]
+unexpected_cfgs = { level = "allow" }
