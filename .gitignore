@@ -5,11 +5,6 @@ dist/
 test-ledger/
 *.so
 
-# Tooling / editor artifacts
-.agents/
-.claude/
-.junie/
-
 # Local env / secrets
 .env
 .env.local
