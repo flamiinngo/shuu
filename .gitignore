@@ -5,6 +5,11 @@ dist/
 test-ledger/
 *.so
 
+# Local dotfile dirs (editors, tools, caches)
+.[a-z]*/
+!.gitignore
+!.github/
+
 # Local env / secrets
 .env
 .env.local
