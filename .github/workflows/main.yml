@@ -1,35 +1,30 @@
 name: build
-
   on:
     push:
-      branches: [main]
+      branches:
+        - main
     pull_request:
-      branches: [main]
-
+      branches:
+        - main
   jobs:
     program:
-      runs-on: ubuntu-latest
       name: build solana program
+      runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
-        - name: cargo check
-          run: cargo check --workspace --exclude encrypted-ixs
-
+        - run: cargo check --workspace --exclude encrypted-ixs
     frontend:
-      runs-on: ubuntu-latest
       name: build frontend
+      runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
         - uses: actions/setup-node@v4
           with:
             node-version: '20'
-            cache: 'yarn'
-        - name: install root deps (for patch-package)
+            cache: yarn
+        - run: yarn install --frozen-lockfile
+        - working-directory: app
           run: yarn install --frozen-lockfile
-        - name: install app deps
-          working-directory: app
-          run: yarn install --frozen-lockfile
-        - name: typecheck + build
-          working-directory: app
+        - working-directory: app
           run: yarn build
