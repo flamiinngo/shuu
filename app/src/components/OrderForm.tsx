@@ -9,7 +9,6 @@ interface Props {
   onDeposit:     (amount: number) => void;
   onWithdraw:    (amount: number) => void;
   hasPosition:   boolean;
-  isLiquidated:  boolean;
   loading:       boolean;
   availableUsdc: number;
 }
@@ -30,7 +29,7 @@ function estPnl(entry: number, target: number, size: number, isLong: boolean) {
   return diff * size;
 }
 
-export function OrderForm({ onOpen, onFaucet, onDeposit, onWithdraw, hasPosition, isLiquidated, loading, availableUsdc }: Props) {
+export function OrderForm({ onOpen, onFaucet, onDeposit, onWithdraw, hasPosition, loading, availableUsdc }: Props) {
   const { current: m } = useMarkets();
   const dp = m.base === "BTC" || m.base === "ETH" ? 2 : 3;
 
@@ -53,7 +52,7 @@ export function OrderForm({ onOpen, onFaucet, onDeposit, onWithdraw, hasPosition
   const slPnl    = slPrice ? estPnl(entry, +slPrice, size, isLong) : null;
   const fee      = notional * 0.00006;
 
-  const canOpen  = !hasPosition && !isLiquidated && !loading;
+  const canOpen  = !hasPosition && !loading;
 
   const fmt = (n: number) =>
     n.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: dp });

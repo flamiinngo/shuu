@@ -30,7 +30,7 @@ export function PositionsPanel({ state, lastTxSig, onCheckLiquidation, onClose, 
   const { current: m } = useMarkets();
   const history = useHistory();
 
-  const isOpen    = state.status === "open" || state.status === "checking";
+  const isOpen    = state.status === "open" || state.status === "checking" || state.status === "closing";
   const isClosed  = state.status === "closed";
   const isLiq     = state.status === "liquidated";
   const dp        = m.base === "BTC" || m.base === "ETH" ? 2 : 3;

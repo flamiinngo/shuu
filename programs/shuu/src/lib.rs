@@ -185,7 +185,6 @@ pub mod shuu {
         nonce:             u128,
         collateral_amount: u64,
     ) -> Result<()> {
-        require!(!ctx.accounts.trader_acc.is_liquidated, ErrorCode::PositionLiquidated);
         require!(
             collateral_amount > 0 && collateral_amount <= ctx.accounts.trader_acc.usdc_balance,
             ErrorCode::InsufficientBalance
@@ -196,6 +195,7 @@ pub mod shuu {
         ctx.accounts.trader_acc.usdc_balance     -= collateral_amount;
         ctx.accounts.trader_acc.locked_collateral = collateral_amount;
         ctx.accounts.trader_acc.is_settled        = false;
+        ctx.accounts.trader_acc.is_liquidated     = false;
 
         let args = ArgBuilder::new()
             .x25519_pubkey(pub_key)

@@ -268,7 +268,6 @@ function Terminal() {
                 onDeposit={deposit}
                 onWithdraw={withdraw}
                 hasPosition={positionState.status === "open" || positionState.status === "checking"}
-                isLiquidated={positionState.status === "liquidated"}
                 loading={loading}
                 availableUsdc={availableUsdc}
               />
