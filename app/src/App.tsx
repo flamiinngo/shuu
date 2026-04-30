@@ -22,6 +22,7 @@ import { WelcomeModal }    from "./components/WelcomeModal";
 import { SealCeremony }   from "./components/SealCeremony";
 import { useShuu }         from "./hooks/useShuu";
 import { useBalance }      from "./hooks/useBalance";
+import { useIsMobile }     from "./hooks/useIsMobile";
 
 // Configurable via Vercel env. Public devnet rate-limits aggressively;
 // for a usable demo, set VITE_RPC_URL to a Helius/QuickNode/Triton devnet endpoint.
@@ -43,13 +44,15 @@ function Terminal() {
   const { current: market } = useMarkets();
   const [timeframe, setTimeframe]   = useState("5m");
   const [modalDismissed, setDismiss] = useState(false);
+  const isMobile = useIsMobile();
+  const [mobileTab, setMobileTab] = useState<"chart" | "trade" | "position">("chart");
 
   const short = publicKey
     ? `${publicKey.toBase58().slice(0, 4)}···${publicKey.toBase58().slice(-4)}`
     : null;
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 2 }}>
+    <div style={{ height: "100dvh", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 2 }}>
 
       {/* ── Header ── */}
       <header style={{
@@ -61,32 +64,37 @@ function Terminal() {
 
         {/* Logo block */}
         <div style={{
-          width: 192, height: "100%", flexShrink: 0,
-          display: "flex", alignItems: "center", gap: 10, padding: "0 16px",
-          borderRight: "1px solid rgba(255,255,255,0.07)",
+          width: isMobile ? "auto" : 192, height: "100%", flexShrink: 0,
+          display: "flex", alignItems: "center", gap: 10, padding: isMobile ? "0 10px" : "0 16px",
+          borderRight: isMobile ? "none" : "1px solid rgba(255,255,255,0.07)",
         }}>
-          <LogoMark size={28} />
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
-            <span style={{
-              fontFamily: "var(--mono)", fontSize: 15, fontWeight: 700,
-              color: "#e8e8f5", letterSpacing: "-0.02em",
-            }}>
-              shuu
-            </span>
-            <span style={{
-              fontFamily: "var(--mono)", fontSize: 7,
-              color: "rgba(124,58,237,0.55)", letterSpacing: "0.22em",
-              textTransform: "uppercase", marginTop: 1,
-            }}>
-              silent perps
-            </span>
-          </div>
+          <LogoMark size={isMobile ? 22 : 28} />
+          {!isMobile && (
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+              <span style={{
+                fontFamily: "var(--mono)", fontSize: 15, fontWeight: 700,
+                color: "#e8e8f5", letterSpacing: "-0.02em",
+              }}>
+                shuu
+              </span>
+              <span style={{
+                fontFamily: "var(--mono)", fontSize: 7,
+                color: "rgba(124,58,237,0.55)", letterSpacing: "0.22em",
+                textTransform: "uppercase", marginTop: 1,
+              }}>
+                silent perps
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Stats bar */}
-        <div style={{ flex: 1, height: "100%", overflow: "hidden" }}>
-          <StatsBar />
-        </div>
+        {!isMobile && (
+          <div style={{ flex: 1, height: "100%", overflow: "hidden" }}>
+            <StatsBar />
+          </div>
+        )}
+        {isMobile && <div style={{ flex: 1 }} />}
 
         {/* Right controls */}
         <div style={{
@@ -95,21 +103,23 @@ function Terminal() {
           height: "100%", flexShrink: 0,
         }}>
           {/* Network pill */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 5,
-            padding: "3px 10px", borderRadius: 20,
-            border: "1px solid rgba(255,255,255,0.07)",
-            background: "rgba(255,255,255,0.02)",
-          }}>
-            <motion.span
-              style={{ width: 5, height: 5, borderRadius: "50%", background: "#7c3aed", display: "block" }}
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span style={{ fontFamily: "var(--mono)", fontSize: 8, color: "rgba(232,232,245,0.38)", letterSpacing: "0.12em" }}>
-              DEVNET · ARCIUM
-            </span>
-          </div>
+          {!isMobile && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 5,
+              padding: "3px 10px", borderRadius: 20,
+              border: "1px solid rgba(255,255,255,0.07)",
+              background: "rgba(255,255,255,0.02)",
+            }}>
+              <motion.span
+                style={{ width: 5, height: 5, borderRadius: "50%", background: "#7c3aed", display: "block" }}
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span style={{ fontFamily: "var(--mono)", fontSize: 8, color: "rgba(232,232,245,0.38)", letterSpacing: "0.12em" }}>
+                DEVNET · ARCIUM
+              </span>
+            </div>
+          )}
 
           {/* Balances */}
           {connected && (
@@ -139,7 +149,7 @@ function Terminal() {
                 </span>
               </div>
 
-              {!balanceLoading && (solBalance === null || solBalance < 0.05) && (
+              {!isMobile && !balanceLoading && (solBalance === null || solBalance < 0.05) && (
                 <a
                   href="https://faucet.solana.com"
                   target="_blank"
@@ -191,6 +201,92 @@ function Terminal() {
       </header>
 
       {/* ── Body ── */}
+      {isMobile ? (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+
+          {/* Mobile tab bar */}
+          <div style={{
+            height: 38, display: "flex", flexShrink: 0,
+            borderBottom: "1px solid rgba(255,255,255,0.07)",
+            background: "rgba(0,0,0,0.3)",
+          }}>
+            {(["chart", "trade", "position"] as const).map((t) => (
+              <button key={t} onClick={() => setMobileTab(t)}
+                style={{
+                  flex: 1, height: "100%",
+                  background: mobileTab === t ? "rgba(124,58,237,0.12)" : "transparent",
+                  borderTop: "none", borderLeft: "none", borderRight: "none",
+                  borderBottom: `2px solid ${mobileTab === t ? "#7c3aed" : "transparent"}`,
+                  color: mobileTab === t ? "#b08ff5" : "rgba(232,232,245,0.4)",
+                  fontFamily: "var(--mono)", fontSize: 10,
+                  letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer",
+                }}
+              >{t}</button>
+            ))}
+          </div>
+
+          {/* Active panel */}
+          <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
+            {mobileTab === "chart" && (
+              <>
+                <div style={{
+                  height: 30, display: "flex", alignItems: "center",
+                  gap: 2, padding: "0 10px",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  background: "rgba(0,0,0,0.2)", flexShrink: 0, overflowX: "auto",
+                }}>
+                  {["1m", "5m", "15m", "1h", "4h", "1d"].map((t) => (
+                    <button key={t} onClick={() => setTimeframe(t)}
+                      style={{
+                        padding: "3px 8px", borderRadius: 5,
+                        background: timeframe === t ? "rgba(124,58,237,0.15)" : "transparent",
+                        border: `1px solid ${timeframe === t ? "rgba(124,58,237,0.4)" : "transparent"}`,
+                        color: timeframe === t ? "#b08ff5" : "rgba(232,232,245,0.3)",
+                        fontFamily: "var(--mono)", fontSize: 9,
+                        cursor: "pointer", letterSpacing: "0.06em",
+                        flexShrink: 0,
+                      }}
+                    >{t}</button>
+                  ))}
+                </div>
+                <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+                  <Chart basePrice={market.price} marketSymbol={market.symbol} />
+                </div>
+              </>
+            )}
+
+            {mobileTab === "trade" && (
+              <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+                {connected ? (
+                  <OrderForm
+                    onOpen={openPosition}
+                    onFaucet={faucetMint}
+                    onDeposit={deposit}
+                    onWithdraw={withdraw}
+                    hasPosition={positionState.status === "open" || positionState.status === "checking"}
+                    loading={loading}
+                    availableUsdc={availableUsdc}
+                  />
+                ) : (
+                  <ConnectPrompt onConnect={() => setVisible(true)} />
+                )}
+              </div>
+            )}
+
+            {mobileTab === "position" && (
+              <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+                <PositionsPanel
+                  state={positionState}
+                  lastTxSig={lastTxSig}
+                  onCheckLiquidation={checkLiquidation}
+                  onClose={computePnl}
+                  loading={loading}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
         {/* Markets sidebar */}
@@ -278,6 +374,7 @@ function Terminal() {
         </div>
 
       </div>
+      )}
 
       {/* Welcome overlay */}
       <WelcomeModal
