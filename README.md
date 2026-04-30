@@ -6,9 +6,17 @@ Trade with leverage where your entry price, size, direction and collateral never
 
 I built this because every perp DEX I've used is a glass house. Bots front-run any sized fill, copy whale entries within seconds, and grief liquidations a tick away from your stop. None of those attacks need permission — they just need the data, and on every other DEX, the data is on chain in cleartext. shuu fixes that at the computation layer instead of behind delays or relayers.
 
+- **Live app** [https://shuu-self.vercel.app](https://shuu-self.vercel.app)
 - **Live program** [`25dRQCUoUhKs4x93zh2p72fdPzvQFDGwcTM4dBrwGhcA`](https://explorer.solana.com/address/25dRQCUoUhKs4x93zh2p72fdPzvQFDGwcTM4dBrwGhcA?cluster=devnet) on Solana devnet
-- **Frontend** running at the URL in the submission
 - **Independent verification:** clone the repo and run `node scripts/verify-onchain.js`. Every privacy claim in this README is checked against live devnet state.
+
+## What you can do
+
+- **Open longs or shorts on BTC/ETH/SOL/AVAX perpetuals**, with up to 50× leverage
+- **Set take-profit and stop-loss** levels at order entry, with live PnL estimates
+- **Maintenance margin enforcement** — anyone (a liquidation bot, you yourself) can call `verify liq.` and the MXE checks privately whether your position is under-collateralised, returning only a yes/no
+- **Close any time** — exit price encrypts to the MXE, realised PnL comes back encrypted to your key, settlement updates your USDC balance on chain
+- **Trade history** persists per wallet in your browser, with explorer links to the on-chain settle transactions
 
 ## How it works
 
