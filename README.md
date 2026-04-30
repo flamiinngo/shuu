@@ -1,5 +1,7 @@
 # shuu
 
+![build](https://github.com/flamiinngo/shuu/actions/workflows/main.yml/badge.svg)
+
 A private perpetuals DEX on Solana, built on Arcium.
 
 Trade with leverage where your entry price, size, direction and collateral never appear on chain in plaintext. The only public output of a position is whether it got liquidated. Everything else is encrypted before it leaves your browser and stays encrypted while the Arcium MPC cluster computes on it.
