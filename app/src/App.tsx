@@ -41,7 +41,7 @@ function Terminal() {
     availableUsdc, lockedCol,
   } = useShuu();
   const { sol: solBalance, loading: balanceLoading } = useBalance();
-  const { current: market } = useMarkets();
+  const { current: market, markets, setSelected } = useMarkets();
   const [timeframe, setTimeframe]   = useState("5m");
   const [modalDismissed, setDismiss] = useState(false);
   const isMobile = useIsMobile();
@@ -229,6 +229,40 @@ function Terminal() {
           <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
             {mobileTab === "chart" && (
               <>
+                {/* Market chips */}
+                <div style={{
+                  display: "flex", gap: 6, padding: "8px 10px",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  background: "rgba(0,0,0,0.25)", flexShrink: 0,
+                  overflowX: "auto",
+                }}>
+                  {markets.map((m) => {
+                    const active = m.symbol === market.symbol;
+                    const up     = m.change24 >= 0;
+                    return (
+                      <button key={m.symbol} onClick={() => setSelected(m.symbol)}
+                        style={{
+                          padding: "6px 10px", borderRadius: 6,
+                          background: active ? "rgba(124,58,237,0.15)" : "rgba(255,255,255,0.03)",
+                          border: `1px solid ${active ? "rgba(124,58,237,0.45)" : "rgba(255,255,255,0.05)"}`,
+                          color: active ? "#b08ff5" : "#e8e8f5",
+                          fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700,
+                          cursor: "pointer", flexShrink: 0,
+                          display: "flex", alignItems: "center", gap: 6,
+                        }}
+                      >
+                        <span>{m.base}</span>
+                        <span style={{
+                          fontSize: 8, fontWeight: 600,
+                          color: up ? "#00d97e" : "#ff4560",
+                        }}>
+                          {up ? "+" : ""}{m.change24.toFixed(2)}%
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <div style={{
                   height: 30, display: "flex", alignItems: "center",
                   gap: 2, padding: "0 10px",
